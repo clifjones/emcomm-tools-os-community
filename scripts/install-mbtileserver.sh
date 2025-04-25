@@ -1,6 +1,7 @@
 #!/bin/bash
 # Author  : Gaston Gonzalez
 # Date    : 24 April 2025
+# Upated  : 25 April 2025
 # Purpose : Install mbtileserver
 set -e
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -11,7 +12,6 @@ trap 'et-log "\"${last_command}\" command failed with exit code $?."' ERR
 APP=mbtileserver
 VERSION=0.11.0
 DOWNLOAD_FILE="${APP}_v${VERSION}_linux_amd64.zip"
-BIN_FILE=QtTermTCP
 INSTALL_DIR="/opt/${APP}-${VERSION}"
 INSTALL_BIN_DIR="${INSTALL_DIR}/bin"
 LINK_PATH="/opt/${APP}"
