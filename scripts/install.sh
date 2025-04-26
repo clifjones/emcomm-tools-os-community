@@ -2,7 +2,7 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 16 March 2024
-# Updated : 25 April 2025
+# Updated : 26 April 2025
 # Purpose : Main installer for EmComm Tools Community (ETC)
 
 . ./env.sh
@@ -65,3 +65,4 @@ exitIfNotRoot
 ./install-mbtileserver.sh
 ./install-python.sh
 ./install-mbutil.sh
+./install-gis-tools.sh
