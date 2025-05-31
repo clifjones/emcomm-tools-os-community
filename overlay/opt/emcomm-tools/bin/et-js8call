@@ -2,7 +2,7 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 24 October 2024
-# Updated : 26 May 2025
+# Updated : 20 November 2024
 # Purpose : Wrapper script for starting JS8Call with PnP support
 #
 # Preconditions
@@ -12,10 +12,6 @@
 # 1. Stop all running EmComm Tools modes
 # 2. JS8Call audio settings updated
 # 3. JS8Call started
-
-ET_HOME=/opt/emcomm-tools
-ACTIVE_RADIO="${ET_HOME}/conf/radios.d/active-radio.json"
-CAT_DEVICE=/dev/et-cat
 
 usage() {
   echo "usage: $(basename $0) <command>"
@@ -66,28 +62,6 @@ update-config () {
 
     ET_RELEASE=$(et-system-info release)
     sed -i "s|^MyInfo.*|MyInfo=${ET_RELEASE}|" ${JS8CALL_CONF_FILE} 
-
-
-    # Set PTT to use Hamlib for both CAT control and PTT (default)
-    sed -i "s|^PTTport.*|PTTport=localhost:4532|" ${JS8CALL_CONF_FILE}
-    sed -i "s|PTT_method_[A-Z][A-Z][A-Z]|PTT_method_CAT|" ${JS8CALL_CONF_FILE}
-
-    # Special case for select radios that only need to key the PTT, but do not
-    # have CAT control support or VOX support. This edge case was added for 
-    # radios like the Yaesu FTX-1 Field before Yaesu published their CAT commands.
-    if [ -L "${ET_HOME}/conf/radios.d/active-radio.json" ]; then
-      RIG_ID=$(cat "${ET_HOME}/conf/radios.d/active-radio.json" | jq -r .rigctrl.id)
-
-      if [ "${RIG_ID}" = "1" ]; then
-        PTT_ONLY=$(cat ${ET_HOME}/conf/radios.d/active-radio.json | jq -r .rigctrl.pttOnly)
-
-        if [ "${PTT_ONLY}" = "true" ]; then
-          et-log "Configued JS8Call for PTT-only mode"
-          sed -i "s|PTT_method_[A-Z][A-Z][A-Z]|PTT_method_RTS|" ${JS8CALL_CONF_FILE}
-          sed -i "s|^PTTport.*|PTTport=/dev/et-cat|" ${JS8CALL_CONF_FILE}
-        fi
-      fi
-    fi
 
     et-log "Updated JS8Call configuration with user callsign '${CALLSIGN}' and grid: '${GRID}'"
 
