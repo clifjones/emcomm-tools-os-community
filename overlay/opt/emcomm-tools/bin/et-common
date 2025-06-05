@@ -1,6 +1,7 @@
 #!/bin/bash
 # Author  : Gaston Gonzalez
 # Date    : 1 February 2025
+# Updated : 5 June 2025
 # Purpose : Common environment variables and functions
 
 export ESC="\x1B"
@@ -11,7 +12,13 @@ export WHITE="${ESC}[97m"
 export YELLOW="${ESC}[1;33m"
 export NC="${ESC}[0m"
 
+# Display an error message in the terminal
 show-err-dialog() {
   local message="$1"
   dialog --title "Notification" --msgbox "$message" 8 60
+}
+
+# Display a notification message as a UI popup in the desktop
+notify-user() {
+  notify-send -t 5000 --app-name="EmComm Tools" "$1"
 }

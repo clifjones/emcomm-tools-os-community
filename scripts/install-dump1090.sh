@@ -1,6 +1,7 @@
 #!/bin/bash
 # Author  : Gaston Gonzalez
 # Date    : 4 June 2025
+# Updated : 5 June 2025
 # Purpose : Install dump1090 (ADB-S aircraft tracking)
 set -e
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -10,15 +11,16 @@ trap 'et-log "\"${last_command}\" command failed with exit code $?."' ERR
 
 APP=dump1090
 VERSION=master
-DOWNLOAD_FILE=master.zip
+DOWNLOAD_FILE=dump1090-master.zip
 BIN_FILE=dump1090
 INSTALL_DIR="/opt/${APP}-${VERSION}"
 INSTALL_BIN_DIR="${INSTALL_DIR}/bin"
 LINK_PATH="/opt/${APP}"
+DUMP1090_CONF_DIR="/etc/skel/.local/share/emcomm-tools/dump1090"
 
 if [[ ! -e ${ET_DIST_DIR}/${DOWNLOAD_FILE} ]]; then
 
-  URL="https://github.com/antirez/dump1090/archive/refs/heads/${DOWNLOAD_FILE}"
+  URL="https://github.com/antirez/dump1090/archive/refs/heads/master.zip"
 
   et-log "Downloading ${APP}: ${URL}"
   curl -s -L -o ${DOWNLOAD_FILE} --fail ${URL}
@@ -41,6 +43,10 @@ fi
 
 [[ ! -e ${INSTALL_BIN_DIR} ]] && mkdir -v -p ${INSTALL_BIN_DIR}
 cp -v "${ET_SRC_DIR}/${APP}-master/${BIN_FILE}" ${INSTALL_BIN_DIR}
+
+# Install HTML map
+[[ ! -e ${DUMP1090_CONF_DIR} ]] && mkdir -v -p ${DUMP1090_CONF_DIR}
+cp -v "${ET_SRC_DIR}/${APP}-master/gmap.html" ${DUMP1090_CONF_DIR}
 
 [[ -e ${LINK_PATH} ]] && rm ${LINK_PATH}
 ln -s ${INSTALL_DIR} ${LINK_PATH}
