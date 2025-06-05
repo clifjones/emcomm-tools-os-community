@@ -12,11 +12,12 @@
 # 1. dump1099 is launched
 # 2. A map is launched
 
+# TODO: Increse size of aircraft
+# TODO: Research why RTL-SDR v4 does not work
 # TODO: Check for RTL-SDR device
 # TODO: Add a systemd user service to start dump1090
-# TODO: Use local offline map
-# TODO: Move map to current position
 # TODO: Use icon and add to launcher
+# TODO: Use local new ETC offline map engine
 
 source /opt/emcomm-tools/bin/et-common
 
@@ -32,6 +33,22 @@ fi
 CWD_DIR=$(pwd)
 
 cd ${DUMP1090_CONF_DIR}
+
+# TODO: Check if I need to look for /dev/et-gps first
+MY_LAT_LON=$(et-system-info et-gps)
+if [[ $? -eq 0 ]]; then
+  if echo "${MY_LAT_LON}" | grep -Eq '^[-+]?[0-9]+(\.[0-9]+)?\s*,\s*[-+]?[0-9]+(\.[0-9]+)?$'; then
+    LAT=$(echo ${MY_LAT_LON} | cut -d "," -f1)
+    LON=$(echo ${MY_LAT_LON} | cut -d "," -f2)
+    ZOOM=10
+
+    sed -i "s/CenterLat=[^;]*;/CenterLat=${LAT};/g" ${DUMP1090_MAP_HTML}
+    sed -i "s/CenterLon=[^;]*;/CenterLon=${LON};/g" ${DUMP1090_MAP_HTML}
+    sed -i "s/setView(\[.*\], *[0-9]*);/setView([${LAT}, ${LON}], ${ZOOM});/" ${DUMP1090_MAP_HTML}
+
+    et-log "Updated map center with your current location."
+  fi
+fi
 
 # replace with systemd
 CMD="dump1090 --net --net-http-port 1090"
