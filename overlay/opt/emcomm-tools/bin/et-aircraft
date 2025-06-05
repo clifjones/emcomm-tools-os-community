@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# Author  : Gaston Gonzalez
+# Date    : 4 June 2025
+# Update  : 5 June 2025
+# Purpose : Wrapper script around dump1090
+#
+# Preconditions:
+# 1. RTL-SDR is connected and detected
+#
+# Postconditions:
+# 1. dump1099 is launched
+# 2. A map is launched
+
+# TODO: Check for RTL-SDR device
+# TODO: Add a systemd user service to start dump1090
+# TODO: Use local offline map
+# TODO: Move map to current position
+# TODO: Use icon and add to launcher
+
+source /opt/emcomm-tools/bin/et-common
+
+DUMP1090_CONF_DIR="${HOME}/.local/share/emcomm-tools/dump1090"
+DUMP1090_MAP_HTML="${DUMP1090_CONF_DIR}/gmap.html"
+
+if [[ ! -e ${DUMP1090_MAP_HTML} ]]; then
+  et-log "Map HTML not found: ${DUMP1090_MAP_HTML}"
+  notify-user "Map HTML not found: ${DUMP1090_MAP_HTML}"
+  exit 1
+fi
+
+CWD_DIR=$(pwd)
+
+cd ${DUMP1090_CONF_DIR}
+
+# replace with systemd
+CMD="dump1090 --net --net-http-port 1090"
+et-log "Starting dump1090 in ${DUMP1090_CONF_DIR} with: ${CMD}"
+
+${CMD}
+
+if [[ $? -ne 0 ]]; then
+  notify-user "RTL-SDR not detected. Please connect it and retry."
+fi
+
+cd ${CWD_DIR}
