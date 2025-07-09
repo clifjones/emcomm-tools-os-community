@@ -2,7 +2,7 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 4 June 2025
-# Update  : 8 June 2025
+# Update  : 8 July 2025
 # Purpose : Wrapper script around ADS-B integration
 #
 # Preconditions:
@@ -10,13 +10,7 @@
 #
 # Postconditions:
 # 1. dump1099 systemd service is launched
-# 2. Web browser is launched with dump1090 map
-
-# TODO: Increse size of aircraft
-# TODO: Additional info
-# TODO: Research why RTL-SDR v4 does not work
-# TODO: Test RTL-SDR v3 
-# TODO: Use ETC offline map engine
+# 2. et-aircraft-app launched
 
 source /opt/emcomm-tools/bin/et-common
 
@@ -41,5 +35,5 @@ fi
 systemctl --user restart et-service-dump1090
 if [[ $? -eq 0 ]]; then
   start_and_wait_for_service et-service-dump1090
-  min http://localhost:1090 2>/dev/null
+  et-aircraft-app
 fi
