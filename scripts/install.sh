@@ -83,4 +83,4 @@ exitIfNotRoot
 
 # Install documentation tools
 ./install-dictionary.sh
-./install-doc-tools.sh
+#./install-doc-tools.sh
