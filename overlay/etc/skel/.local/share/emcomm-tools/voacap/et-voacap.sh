@@ -20,14 +20,11 @@ lookup_station() {
       fi
       ;;
     grid)
-      echo "Grid not support not yet implemented"
-      exit 1
-
-      #curl -f -s "http://localhost:1981/api/geo/grid=${value}" > "$json_file"
-      #if [[ $? -ne 0 ]]; then
-      #  echo "Location not found for grid: ${value}. Exiting."
-      #  exit 1
-      #fi
+      curl -f -s "http://localhost:1981/api/geo/grid?gridSquare=${value}"  | jq '{lat: .position.lat, lon: .position.lon}' > "$json_file"
+      if [[ $? -ne 0 ]]; then
+        echo "Error converting grid to lat/lon: ${value}. Exiting."
+        exit 1
+      fi
       ;;
     latlon)
       # Write directly to JSON for consistency
@@ -59,6 +56,7 @@ if [[ ! -e ${ET_SSN} ]]; then
   echo -e "${YELLOW}Try running the following to fetch the sunspot numbers (requires Internet):${NC}"
   echo -e "${WHITE}cd ${HOME}/.local/share/emcomm-tools/voacap${NC}"
   echo -e "${WHITE}./fetch-ssn.sh${NC}"
+
   exit 1
 fi
 
