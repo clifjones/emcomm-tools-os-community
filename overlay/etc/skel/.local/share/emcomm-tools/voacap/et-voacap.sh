@@ -2,9 +2,13 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 23 May 2023
-# Updated : 21 August 2025
+# Updated : 24 August 2025
 # Purpose : Offline HF prediction using voacapl
+#set -e
 set -o pipefail
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+trap 'echo -e "${RED}\"${last_command}\" command failed with exit code $?.${NC}"' ERR
+
 source /opt/emcomm-tools/bin/et-common
 
 lookup_station() {
@@ -16,14 +20,14 @@ lookup_station() {
     call)
       curl -f -s "http://localhost:1981/api/license?callsign=${value}" > "$json_file"
       if [[ $? -ne 0 ]]; then
-        echo "Location not found for callsign: ${value}. Exiting."
+        echo -e "${RED}Location not found for callsign: ${value}.${NC}" >&2
         exit 1
       fi
       ;;
     grid)
       curl -f -s "http://localhost:1981/api/geo/grid?gridSquare=${value}"  | jq '{lat: .position.lat, lon: .position.lon}' > "$json_file"
       if [[ $? -ne 0 ]]; then
-        echo "Error converting grid to lat/lon using value: ${value}. Exiting."
+        echo -e "${RED}Error converting grid to lat/lon using value: ${value}.${NC}" >&2 
         exit 1
       fi
       ;;
@@ -32,13 +36,13 @@ lookup_station() {
       local lat lon
       IFS=',' read -r lat lon <<< "$value"
       if [[ -z $lat || -z $lon ]]; then
-        echo "Invalid lat,lon format: $value. Expected 'lat,lon'. Exiting."
+        echo -e "${RED}Invalid lat,lon format: $value. Expected 'lat,lon'.${NC}" >&2
         exit 1
       fi
       jq -n --arg lat "$lat" --arg lon "$lon" '{lat: ($lat|tonumber), lon: ($lon|tonumber)}' > "$json_file"
       ;;
     *)
-      echo "Invalid station type: $type"
+      echo -e "${RED}Invalid station type: $type${NC}" >&2
       exit 1
       ;;
   esac
@@ -53,7 +57,7 @@ lookup_station() {
 
 ET_SSN="${HOME}/.local/share/emcomm-tools/voacap/ssn.txt"
 if [[ ! -e ${ET_SSN} ]]; then
-  echo -e "${RED}Sunspot number file  not available:${WHITE}${ET_SSN}${NC}"
+  echo -e "${RED}Sunspot number file not available:${WHITE}${ET_SSN}${NC}"
   echo -e "${YELLOW}Try running the following to fetch the sunspot numbers (requires Internet):${NC}"
   echo -e "${WHITE}cd ${HOME}/.local/share/emcomm-tools/voacap${NC}"
   echo -e "${WHITE}./fetch-ssn.sh${NC}"
@@ -110,6 +114,28 @@ done
 #echo "Power: $power"
 #echo "Mode: $mode"
 
+# Allow for case-insensitve match of the user-defined operating mode
+MODE=$mode
+case "${MODE,,}" in
+  js8)
+    MD="13.0"
+    ;;
+  cw)
+    MD="24.0"
+    ;;
+  ssb)
+    MD="38.0"
+    ;;
+  am)
+    MD="49.0"
+    ;;
+  *)
+    echo -e "${RED}Unknown mode: ${MODE}${NC}" >&2
+    usage
+    exit 1
+    ;;
+esac
+
 ET_VOA_WORKING_DIR=$HOME/itshfbc/run
 ET_VOA_REPORT=${ET_VOA_WORKING_DIR}/voacapl.txt
 INP=${ET_VOA_WORKING_DIR}/voacapx.dat
@@ -126,7 +152,12 @@ MONTH_FMT=$(date +'%-m.00')
 # TX Antenna
 #######################################################################
 
-result=$(lookup_station "$tx_type" "$tx_value" tx-station.json)
+if ! result=$(lookup_station "$tx_type" "$tx_value" tx-station.json); then
+  echo "Try specifying a grid or lat,lon for the transmitting station."
+  echo "  --tx-grid GRID            Transmitting station Maidenhead grid"
+  echo "  --tx-latlon LAT,LON       Transmitting station coordinates in decimal degrees"
+  exit 1
+fi
 read TL TK <<< "$result"
 
 TL1=$( awk -v n1=$TL -v n2=90 -v n3=-90 'BEGIN {if (n1<n3 || n1>n2) printf ("%s", "a"); else printf ("%.2f", n1);}' )
@@ -144,7 +175,12 @@ TLO=$( awk -v n1=$TK1 -v n2=0 'BEGIN {if (n1<n2) { n1=substr(n1,2); printf ("%7s
 # RX Antenna
 #######################################################################
 
-result=$(lookup_station "$rx_type" "$rx_value" rx-station.json)
+if ! result=$(lookup_station "$rx_type" "$rx_value" rx-station.json); then
+  echo "Try specifying a grid or lat,lon for the receiving station."
+  echo "  --rx-grid GRID            Receiving station Maidenhead grid"
+  echo "  --rx-latlon LAT,LON       Receiving station coordinates in decimal degrees"
+  exit 1
+fi
 read RL RK <<< "$result"
 
 RL1=$( awk -v n1=$RL -v n2=90 -v n3=-90 'BEGIN {if (n1<n3 || n1>n2) printf ("%s", "a"); else printf ("%.2f", n1);}' )
@@ -177,20 +213,6 @@ else
   echo "Unsupported power level."
   usage
   exit 1
-fi
-
-# Mode
-MODE=$mode
-MD="24.0"
-echo "Mode: ${MODE}"
-if [ "$MODE" = "JS8" ]; then
-    MD="13.0"
-elif [ "$MODE" = "CW" ]; then
-    MD="24.0"
-elif [ "$MODE" = "SSB" ]; then
-    MD="38.0"
-elif [ "$opt" = "AM" ]; then
-    MD="49.0"
 fi
 
 # Format for 117
