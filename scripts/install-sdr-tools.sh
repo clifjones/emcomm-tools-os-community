@@ -6,14 +6,10 @@
 set -e
 
 et-log "Installing SDR tools..."
-apt install \
-  rtl-sdr \
-  librtlsdr-dev \
-  -y
-
 . ./env.sh
 
 APP=rtl-sdr
+REPO=https://github.com/osmocom/rtl-sdr
 REPO_SRC_DIR="${ET_SRC_DIR}/${APP}"
 
 [[ ! -e ${ET_SRC_DIR} ]] && mkdir ${ET_SRC_DIR}
@@ -29,24 +25,35 @@ apt-get install \
     git \
     cmake \
     pkg-config \
+    debhelper \
     -y
 
 et-log "Cloning ${APP} repository..."
 if [[ ! -e ${REPO_SRC_DIR} ]]; then
-  cd ${ET_SRC_DIR} && git clone ${REPO}
+  mkdir ${REPO_SRC_DIR} 
+  cd ${REPO_SRC_DIR} && git clone ${REPO} src
 fi
 
-cd ${REPO_SRC_DIR}
+cd ${REPO_SRC_DIR}/src
 
 et-log "Building ${APP}..."
-mkdir build
+if [[ ! -e build ]]; then
+  mkdir build
+fi
+
 cd build
 cmake ../ -DINSTALL_UDEV_RULES=ON
 make
 make install
-cp ../rtl-sdr.rules /etc/udev/rules.d/
 ldconfig
 
 echo 'blacklist dvb_usb_rtl28xxu' | tee --append /etc/modprobe.d/blacklist-dvb_usb_rtl28xxu.conf
+
+cd ..
+dpkg-buildpackage -b --no-sign
+cd ..
+
+dpkg -i librtlsdr0_*
+dpkg -i librtlsdr-dev_*
 
 cd ${CWD_DIR}
