@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author  : Gaston Gonzalez
 # Date    : 11 October 2024
-# Updated : 21 May 2025
+# Updated : 13 September 2025
 # Purpose : Perform tests that can be used by the udev subsystem to aid
 #           in rule development. This is intended to by used with the PROGRAM
 #           directive inside of a udev rule.
@@ -78,6 +78,11 @@ test_digirig_mobile() {
 
     if [[ "$ID" == "yaesu-ft897d" ]]; then
       et-log "Old DigiRig Mobile detected for FT-897D"
+      exit 0
+    fi
+
+    if [[ "$ID" == "lab599-tx500mp" ]]; then
+      et-log "Old DigiRig Mobile detected for TX-500MP"
       exit 0
     fi
 
