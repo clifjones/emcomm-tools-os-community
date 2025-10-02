@@ -1063,7 +1063,7 @@ CWI threshold (CWI detection and suppression) -->
 
 <!-- type: bool; default: false
 Long receive integration -->
-<MT63INTEGRATION>0</MT63INTEGRATION>
+<MT63INTEGRATION>1</MT63INTEGRATION>
 
 <!-- type: bool; default: true
 Also transmit upper start tone (only if MT63USETONES is enabled) -->

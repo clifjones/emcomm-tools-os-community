@@ -106,8 +106,18 @@ sed -i "s|^<HAMLIBCMDPTT>.*|<HAMLIBCMDPTT>1</HAMLIBCMDPTT>|" ${FLDIGI_CONF_FILE}
 sed -i "s|^<HAMRIGDEVICE>.*|<HAMRIGDEVICE>localhost:4532</HAMRIGDEVICE>|" ${FLDIGI_CONF_FILE}
 
 
+######################################
 # Enable Reed Soloman ID for RX and TX
+######################################
 et-log "Enabling Reed Soloman ID for RX/TX..."
 
 sed -i "s|^<RECEIVERSID>.*|<RECEIVERSID>1</RECEIVERSID>|" ${FLDIGI_CONF_FILE}
 sed -i "s|^<TRANSMITRSID>.*|<TRANSMITRSID>1</TRANSMITRSID>|" ${FLDIGI_CONF_FILE}
+
+
+###########################
+# Modem configuration: MT63
+###########################
+et-log "Updating MT63 modem configuration..."
+
+sed -i "s|^<MT63INTEGRATION>.*|<MT63INTEGRATION>1</MT63INTEGRATION>|" ${FLDIGI_CONF_FILE}
