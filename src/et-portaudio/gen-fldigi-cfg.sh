@@ -142,3 +142,6 @@ sed -i "s|^<FLMSG_PATHNAME>.*|<FLMSG_PATHNAME>/usr/local/bin/flmsg</FLMSG_PATHNA
 
 # TODO: Add flmsg to ETC installer
 # TODO: Add flamp to ETC installer
+# TODO: Revisit autostart configuration to start flamp
+# TODO: Revisit TCP/IP configuration when porting ETC R2 Build 56
+# TODO: Define TTP/ETC macros
