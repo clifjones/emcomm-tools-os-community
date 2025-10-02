@@ -2144,7 +2144,7 @@ Operator call sign, if distinct from the station call MYCALL -->
 <!-- type: int; default: SND_IDX_NULL
 Audio subsystem.  Values are as follows:
   0: OSS; 1: PortAudio; 2: PulseAudio; 3: File I/O -->
-<AUDIOIO>3</AUDIOIO>
+<AUDIOIO>1</AUDIOIO>
 
 <!-- type: std::string; default: &quot;&quot;
 OSS device name -->
@@ -2156,19 +2156,19 @@ For compatibility with older versions -->
 
 <!-- type: std::string; default: &quot;&quot;
 PortAudio input device name -->
-<PORTINDEVICE>default</PORTINDEVICE>
+<PORTINDEVICE>{{ET_PORTAUDIO_DEVICE}}</PORTINDEVICE>
 
 <!-- type: int; default: -1
 PortAudio input device index -->
-<PORTININDEX>19</PORTININDEX>
+<PORTININDEX>{{ET_PORTAUDIO_INDEX}}</PORTININDEX>
 
 <!-- type: std::string; default: &quot;&quot;
 PortAudio output device name -->
-<PORTOUTDEVICE>default</PORTOUTDEVICE>
+<PORTOUTDEVICE>{{ET_PORTAUDIO_DEVICE}}</PORTOUTDEVICE>
 
 <!-- type: int; default: -1
 PortAudio input device index -->
-<PORTOUTINDEX>19</PORTOUTINDEX>
+<PORTOUTINDEX>{{ET_PORTAUDIO_INDEX}}</PORTOUTINDEX>
 
 <!-- type: std::string; default: &quot;&quot;
 PortAudio alert device name -->
