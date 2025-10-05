@@ -15,6 +15,7 @@ function usage() {
   echo "  et-gps        - Show state of GPS interface"
   echo "  et-time       - Show if time is synched via GPS"
   echo "  et-mode       - Show current mode"
+  echo "  et-sdr        - Show state of SDR interface"
   echo "  grid          - Current grid square defined by user"
   echo "  ip            - System IP address"
   echo "  release       - EmComm Tools release"
@@ -127,6 +128,15 @@ case $1 in
     fi
 
     ;; 
+  et-sdr)
+    # 1. Check if the symlink was created by the udev rules
+    if [ -e /dev/et-sdr ]; then 
+        echo "Connected"; 
+    else
+      echo "Not connected";
+    fi
+
+    ;;
   et-gps)
 
     # 1. Check if the symlink was created by the udev rules

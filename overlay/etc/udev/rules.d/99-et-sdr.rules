@@ -13,3 +13,5 @@
 
 KERNEL=="swradio0", \
    GROUP="dialout", MODE="0660", SYMLINK+="et-sdr"
+
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="2838", GROUP="dialout", MODE="0660", SYMLINK+="et-sdr"
