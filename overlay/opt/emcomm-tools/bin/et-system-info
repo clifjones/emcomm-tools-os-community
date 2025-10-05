@@ -1,8 +1,9 @@
 #!/bin/bash
 #
 # Author   : Gaston Gonzalez
+# Author   : William McKeehan
 # Date     : 6 October 2024
-# Updated  : 25 March 2025
+# Updated  : 5 September 2025
 # Purpose  : Utility script for dumping system information
 
 function usage() {

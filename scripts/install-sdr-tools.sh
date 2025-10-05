@@ -1,7 +1,9 @@
 #!/bin/bash
 #
 # Author  : Gaston Gonzalez
+# Author  : William McKeehan
 # Date    : 4 June 2025
+# Updated : 5 October 2025
 # Purpose : Install SDR tools
 set -e
 
