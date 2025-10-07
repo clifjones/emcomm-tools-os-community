@@ -6,7 +6,7 @@
     "id": "3087",
     "baud": "19200",
     "ptt": "RIG",
-    "conf": "stop_bits=1"
+    "conf": "timeout=1000,retry=1,timeout_retry=1"
   },
   "notes": [
     "Turn on radio",
