@@ -10,6 +10,10 @@ export ET_DEVICE_CAT="/dev/et-cat"
 export ET_DEVICE_GPS="/dev/et-gps"
 export ET_DEVICE_SDR="/dev/et-sdr"
 
+# Standardized configuration locations and files
+export ET_HOME="/opt/emcomm-tools"
+export ET_ACTIVE_RADIO_CONF="${ET_HOME}/conf/radios.d/active-radio.json"
+
 export ESC="\x1B"
 export RED="${ESC}[1;31m"
 export BLUE="${ESC}[1;34m"
@@ -151,15 +155,14 @@ download_with_retries() {
 # executed before it starts up..
 prime_rigctld_conn() {
  
-  ACTIVE_RADIO=$(et-system-info active-radio)
-  case "${ACTIVE_RADIO}" in
-    "X6100")
-      et-log "Priming rig control client connection for ${ACTIVE_RADIO}"
+  ACTIVE_RADIO=$(jq -r -e '.rigctrl.primeRig' ${ET_ACTIVE_RADIO_CONF})
+  if [[ $? -eq 0 ]]; then
+    if [[ "${ACTIVE_RADIO}" = "true" ]]; then
+      et-log "Priming rig control client connection"
       notify_user "Please be patient. Priming connection to radio."
       rigctl -m 2 f > /dev/null
-      ;;
-    *)
-      et-log "No rigctld priming needed for ${ACTIVE_RADIO}"
-      ;;
-  esac
+    else
+      et-log "No rigctld priming needed" 
+    fi
+  fi
 }
