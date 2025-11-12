@@ -2,7 +2,7 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 23 May 2023
-# Updated : 27 August 2025
+# Updated : 12 November 2025
 # Purpose : Offline HF prediction using voacapl
 set -e
 set -o pipefail
@@ -144,7 +144,7 @@ usage() {
   echo 
   echo "Other options (required):"
   echo "  -p POWER                  Output power [5|20|100|500|1500]"
-  echo "  -m MODE                   Mode [am|cw|js8|ssb]"
+  echo "  -m MODE                   Mode [am|ardop|cw|js8|ssb]"
   echo
 
   exit 1
@@ -197,6 +197,9 @@ case "${MODE,,}" in
     ;;
   js8-fast)
     MD="19.0"
+    ;;
+  ardop)
+    MD="20.0"
     ;;
   js8-turbo)
     MD="24.0"
