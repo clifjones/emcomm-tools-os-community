@@ -1,12 +1,19 @@
 #!/bin/bash
 # Author  : Gaston Gonzalez
 # Date    : 8 November 2024
-# Updated : 26 March 2025
+# Updated : 12 November 2025
 # Purpose : Install Linbpq
 #
 # Notes:
 # These build steps are partially based on an article by the Modern Ham (KN4MKB).
 # https://themodernham.com/install-linbpq-bbs-packet-node-on-debian-ubuntu-and-raspbian/
+set -e
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+trap 'et-log "\"${last_command}\" command failed with exit code $?."' ERR
+
+. ./env.sh
+. ../overlay/opt/emcomm-tools/bin/et-common
+
 
 VERSION=latest
 FILE=linbpq
@@ -26,7 +33,8 @@ BBS_HOME="/etc/skel/.local/share/emcomm-tools/bbs-server"
 BBS_HOME_FILES="${BBS_HOME}/Files"
 
 et-log "Downloading web interface for LinBPQ from ${HTML_ZIP_URL}"
-curl -s -f -L -o ${HTML_ZIP_FILE} ${HTML_ZIP_URL}
+download_with_retries ${HTML_ZIP_URL} ${HTML_ZIP_FILE}
+
 
 if [[ $? -eq 0 ]]; then
 
@@ -61,7 +69,7 @@ URL="https://www.cantab.net/users/john.wiseman/Downloads/${FILE}"
 
 if [ ! -e ${FILE} ]; then
   et-log "Downloading Linbpq: ${URL}"
-  curl -s -L -o ${FILE} --fail ${URL}
+  download_with_retries ${URL} ${FILE}
 fi
 
 [ ! -e ${INSTALL_BIN_DIR} ] && mkdir -v -p ${INSTALL_BIN_DIR}

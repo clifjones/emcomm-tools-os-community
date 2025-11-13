@@ -2,12 +2,14 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 4 December 2024
+# Updated : 12 November 2025
 # Purpose : Install chattervox protocol
 set -e
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 trap 'et-log "\"${last_command}\" command failed with exit code $?."' ERR
 
 . ./env.sh
+. ../overlay/opt/emcomm-tools/bin/et-common
 
 NAME=chattervox
 VERSION=0.7.0
@@ -20,7 +22,7 @@ et-log "Installing ${NAME} ${VERSION}..."
 URL=https://github.com/brannondorsey/chattervox/releases/download/v${VERSION}/chattervox-linux-x64.tar.gz
 
 et-log "Downloading: ${URL}"
-curl -s -L -o ${TARBALL} --fail ${URL}
+download_with_retries ${URL} ${TARBALL}
 
 CWD_DIR=`pwd`
 

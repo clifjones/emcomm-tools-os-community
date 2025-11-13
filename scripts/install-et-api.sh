@@ -11,7 +11,7 @@ trap 'et-log "\"${last_command}\" command failed with exit code $?."' ERR
 . ../overlay/opt/emcomm-tools/bin/et-common
 
 APP=et-api
-VERSION=1.1.0
+VERSION=1.1.1
 ET_API_JAR="emcomm-tools-api-${VERSION}.jar"
 BASE_URL="https://github.com/thetechprepper/et-api-java/releases/download/${VERSION}"
 
