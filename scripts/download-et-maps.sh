@@ -18,8 +18,8 @@ OPTIONS=(
 # Map each option to its corresponding file name
 declare -A FILES
 FILES=(
-  ["us"]="osm-us-zoom0to10-20250703.mbtiles"
-  ["ca"]="osm-ca-zoom0to10-20250703.mbtiles"
+  ["us"]="osm-us-zoom0to11-20251120.mbtiles"
+  ["ca"]="osm-ca-zoom0to10-20251120.mbtiles"
   ["world"]="osm-world-zoom0to6-20251120.mbtiles"
 )
 
