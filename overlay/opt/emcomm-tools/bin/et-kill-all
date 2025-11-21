@@ -2,7 +2,7 @@
 #
 # Author   : Gaston Gonzalez
 # Date     : 12 November 2024
-# Updated  : 7 February 2025
+# Updated  : 2 October 2025
 # Purpose  : Stops all EmComm Tools sound-based services (i.e. modems) and
 #            amatuer radio applications to ensure a clean start for the next mode.
 

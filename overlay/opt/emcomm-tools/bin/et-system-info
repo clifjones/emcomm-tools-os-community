@@ -1,8 +1,9 @@
 #!/bin/bash
 #
 # Author   : Gaston Gonzalez
+# Author   : William McKeehan
 # Date     : 6 October 2024
-# Updated  : 25 March 2025
+# Updated  : 5 September 2025
 # Purpose  : Utility script for dumping system information
 
 function usage() {
@@ -15,6 +16,7 @@ function usage() {
   echo "  et-gps        - Show state of GPS interface"
   echo "  et-time       - Show if time is synched via GPS"
   echo "  et-mode       - Show current mode"
+  echo "  et-sdr        - Show state of SDR interface"
   echo "  grid          - Current grid square defined by user"
   echo "  ip            - System IP address"
   echo "  release       - EmComm Tools release"
@@ -39,7 +41,21 @@ case $1 in
     cat ${ET_USER_CONFIG} | jq -r .callsign
     ;;
   grid)
-    cat ${ET_USER_CONFIG} | jq -r .grid
+    FALLBACK_GRID=$(jq -r -e '.grid' ${ET_USER_CONFIG})
+    GEO_CONF=/tmp/geo.tmp
+
+    curl -f -s "http://localhost:1981/api/geo/position" > ${GEO_CONF}
+    if [[ $? -eq 0 ]]; then
+      API_GRID=$(jq -r -e '.position.gridSquare' ${GEO_CONF})
+      [[ -e ${GEO_CONF} ]] && rm ${GEO_CONF}
+      if [[ $? -eq 0 ]]; then
+        echo ${API_GRID}
+        exit
+      fi
+    fi
+
+    echo ${FALLBACK_GRID}
+
     ;;
   et-audio)
 
@@ -127,6 +143,15 @@ case $1 in
     fi
 
     ;; 
+  et-sdr)
+    # 1. Check if the symlink was created by the udev rules
+    if [ -e /dev/et-sdr ]; then 
+        echo "Connected"; 
+    else
+      echo "Not connected";
+    fi
+
+    ;;
   et-gps)
 
     # 1. Check if the symlink was created by the udev rules

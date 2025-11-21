@@ -1,6 +1,7 @@
 #!/bin/bash
 # Author   : Gaston Gonzalez
 # Date     : 21 November 2024
+# Updated  : 13 November 2025
 # Purpose  : Determines if time has been synchronized via GPS
 
 if [ ! -e /dev/et-gps ]; then
@@ -8,7 +9,7 @@ if [ ! -e /dev/et-gps ]; then
   exit 1
 fi
 
-TRACKING_INFO=$(chronyc tracking | grep GPS)
+TRACKING_INFO=$(chronyc tracking | grep NMEA)
 if [ $? -ne 0 ]; then
   et-log "GPS plugged in, but not used for time source. There may an internet connection."
   exit 1

@@ -2,7 +2,7 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 24 October 2024
-# Updated : 20 November 2024
+# Updated : 7 October 2025
 # Purpose : Wrapper script for starting JS8Call with PnP support
 #
 # Preconditions
@@ -12,6 +12,7 @@
 # 1. Stop all running EmComm Tools modes
 # 2. JS8Call audio settings updated
 # 3. JS8Call started
+. /opt/emcomm-tools/bin/et-common
 
 usage() {
   echo "usage: $(basename $0) <command>"
@@ -32,6 +33,10 @@ notify_user() {
 }
 
 start() {
+
+  # Ensure that we have a pre-initialized CAT control connection for select radios
+  prime_rigctld_conn
+
   /opt/emcomm-tools/bin/et-kill-all && update-config && /usr/bin/js8call &
 
   if [ ! -e /dev/et-gps ]; then
@@ -42,7 +47,7 @@ start() {
 
 }
 
-update-config () {
+update-config() {
 
     JS8CALL_CONF_FILE="${HOME}/.config/JS8Call.ini"
    
@@ -50,7 +55,7 @@ update-config () {
 
     # Update configuration with current callsign and grid
     CALLSIGN=$(cat ${ET_USER_CONFIG} | jq -r .callsign)
-    GRID=$(cat ${ET_USER_CONFIG} | jq -r .grid)
+    GRID=$(et-system-info grid)
 
     if [ "${CALLSIGN}" = "N0CALL" ]; then
       notify_user "Can't start JS8Call. No callsign set. Run: et-user."

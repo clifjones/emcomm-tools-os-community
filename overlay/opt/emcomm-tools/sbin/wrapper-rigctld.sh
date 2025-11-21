@@ -2,12 +2,15 @@
 #
 # Author  : Gaston Gonzalez
 # Date    : 9 October 2024
-# Updated : 28 October 2024
+# Updated : 26 September 2025
 # Purpose : Wrapper startup/shutdown script around systemd/rigctld
 
 ET_HOME=/opt/emcomm-tools
 ACTIVE_RADIO="${ET_HOME}/conf/radios.d/active-radio.json"
 CAT_DEVICE=/dev/et-cat
+
+# Additional configuration to pass to rigctld
+SET_CONF=""
 
 do_full_auto() {
   et-log "Found ET_DEVICE='${ET_DEVICE}'"
@@ -41,8 +44,19 @@ start() {
       ID=$(cat ${ET_HOME}/conf/radios.d/active-radio.json | jq -r .rigctrl.id)
       PTT=$(cat ${ET_HOME}/conf/radios.d/active-radio.json | jq -r .rigctrl.ptt)
 
-      CMD="rigctld -m ${ID} -P ${PTT} "
-      et-log "Starting rigctld in VOX mode with: ${CMD}"
+      # Special case for select radios that only need to key the PTT, but do
+      # do not have CAT control support. This edge case was added for radios
+      # like the Yaesu FTX-1 Field before Yaesu published their CAT commands.
+      PTT_ONLY=$(cat ${ET_HOME}/conf/radios.d/active-radio.json | jq -r .rigctrl.pttOnly)
+
+      if [ "${PTT_ONLY}" = "true" ]; then
+        CMD="rigctld -m ${ID} -p ${CAT_DEVICE} -P ${PTT} "
+        et-log "Starting rigctld in PTT-only mode with: ${CMD}"
+      else
+        CMD="rigctld -m ${ID} -P ${PTT} "
+        et-log "Starting rigctld in VOX mode with: ${CMD}"
+      fi
+
       $CMD
       exit 0
     fi
@@ -84,8 +98,14 @@ start() {
     exit 0
   fi
 
+  # Handle optional configuration settings
+  CONF=$(jq -e -r '.rigctrl.conf' "${ET_HOME}/conf/radios.d/active-radio.json")
+  if [[ $? -eq 0 ]]; then
+    SET_CONF="--set-conf=${CONF}"
+  fi
+
   # Generate command
-  CMD="rigctld -m ${ID} -r ${CAT_DEVICE} -s ${BAUD} -P ${PTT} "
+  CMD="rigctld -m ${ID} -r ${CAT_DEVICE} -s ${BAUD} -P ${PTT} ${SET_CONF}"
   et-log "Starting rigctld with: ${CMD}"
   $CMD
 }
